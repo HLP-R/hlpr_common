@@ -1,0 +1,22 @@
+<package>
+  <name>hlpr_common</name>
+  <version>1.0.0</version>
+  <description>Metapackage for the ROS Packages for all singleton packages or packages that don't yet have a home in the HLP-R common platform (Stanley Vector)</description>
+  <author email="athomaz@ece.utexas.edu">Andrea Thomaz</author>
+  <author email="vchu@gatech.edu">Vivian Chu</author>
+  <maintainer email="vchu@gatech.edu">Vivian Chu</maintainer>
+  
+  <url type="website">https://github.com/HLP-R/hlpr_common/wiki</url>
+  <url type="bugtracker">https://github.com/HLP-R/hlpr_common/issues</url>
+  <url type="repository">https://github.com/HLP-R/hlpr_common</url>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>hlpr_lookat</run_depend>
+  
+  <export>
+    <metapackage />
+  </export>
+</package>
+
