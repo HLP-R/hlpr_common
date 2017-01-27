@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Global flags to turn things on and off -->
+    <arg name="poli_urdf" default="false"/> <!-- Sets what URDF to use -->
+    <arg name="verbose" default="false"/> <!-- Global verbose flag -->
+    <arg name="sim" default="true"/> <!-- Simulation flag-->
+
+    <!-- Speech internal listener related -->
+    <arg name="speech" default="true"/> <!-- Turns ALL speech on and off includes input-->
+    <arg name="speech_config_file" default="$(find hlpr_speech_recognition)/config/speech.yaml"/>
+    <arg name="speech_yaml_list" default="$(find hlpr_speech_recognition)/data/kps.yaml"/>
+
+    <!-- Speech external input (mic or gui) -->
+    <arg name="speech_gui" default="true"/>
+    <arg name="speech_dict_path" default="$(find hlpr_speech_recognition)/data/kps.dic" />
+    <arg name="speech_kps_path" default="$(find hlpr_speech_recognition)/data/kps.txt" />
+
+    <!-- Lookat service -->
+    <arg name="lookat" default="true"/> <!-- Global flag for head control -->
+    <arg name="lookat_eef_service" default="false"/> <!-- Compute EEF lookat positions -->
+    <arg name="lookat_waypoint_server" default="false"/> <!-- Action server for lookat waypoints -->
+
+    <!-- Navigation -->
+    <arg name="navigation" default="true"/>
+    <arg name="nav_map" default="simulation_room"/>
+    <arg name="nav_rviz" default="true"/>
+
+    <!-- Arm Drivers -->
+    <arg name="jaco_arm" default="true"/>
+    
+
+    <!-- NAVIGATION -->
+    <group if="(arg navigation)">
+        <!-- Starts up move base and localization nodes -->
+        <include file="$(find vector_navigation_apps)/launch/2d_map_nav_demo.launch">
+            <arg name="map_file" value="$(arg nav_map)"/>
+        </include>
+
+        <!-- Launch GUI for viewing -->
+        <include file="$(find vector_viz)/launch/view_robot.launch" if="(arg nav_rviz)">
+            <arg name="function" value="map_nav"/>
+        </include>
+    </group>
+
+    <!-- SPEECH -->
+    <group if="$(arg speech)">
+        <!-- Start speech listener-->
+        <include file="$(find hlpr_speech_recognition)/launch/speech_listener.launch">
+            <arg name="yaml_list" value="$(arg speech_yaml_list)"/>
+            <arg name="config_file" value="$(arg speech_config_file)"/>
+        </include>
+
+        <!-- Start speech input (mic or gui)-->
+        <node name="speech_input" pkg="hlpr_speech_recognition" type="speech_gui" output="screen" if="$(arg speech_gui)"/>
+        <include file="$(find hlpr_speech_recognition)/launch/speech_microphone.launch" unless="$(arg speech_gui)">
+            <arg name="dict_path" value="$(arg speech_dict_path)"/>
+            <arg name="kps_path" value="$(arg speech_kps_path)"/>
+        </include>
+    </group>
+
+    <!-- LOOKAT -->
+    <group if="$(arg lookat)"/>
+        <!-- Start the backend IK look service -->
+        <include file="$(find hlpr_lookat)/launch/start_lookat_service.launch">
+            <arg name="poli_urdf" value="$(arg poli_urdf)"/>
+            <arg name="verbose" value="$(arg verbose)"/>
+        </include>
+
+        <!-- Start the lookat EEF service -->
+        <node name="hlpr_lookat_eef" pkg="hlpr_lookat" type="look_at_eef.py" respawn="false" output="screen" / if="$(lookat_eef_service)">
+
+        <!-- Start a lookat waypoint lookat service -->
+        <include file="$(find hlpr_lookat)/launch/waypoint_action_server.launch" if="$(arg lookat_waypoint_server)">
+            <arg name="verbose" value="$(arg verbose)"/>
+        </include>
+    </group>
+
+
+    
+
+
+
+
+
+</launch>

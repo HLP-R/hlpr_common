@@ -1,0 +1,54 @@
+- git:
+    local-name: vector_v1
+    uri: git@github.com:StanleyInnovation/vector_v1.git
+    version: master
+
+- git:
+    local-name: wpi_jaco
+    uri: git@github.com:GT-RAIL/wpi_jaco.git
+    version: vector-develop
+
+- git:
+    local-name: rail_manipulation_msgs
+    uri: git@github.com:GT-RAIL/rail_manipulation_msgs.git
+    version: develop
+
+- git:
+    local-name: robotiq_85_gripper
+    uri: https://github.com/StanleyInnovation/robotiq_85_gripper.git
+    version: master
+
+- git:
+    local-name: hlpr_simulator
+    uri: git@github.com:HLP-R/hlpr_simulator.git
+    version: master
+
+- git:
+    local-name: hlpr_fsm
+    uri: git@github.com:HLP-R/hlpr_fsm.git
+    version: master
+
+- git:
+    local-name: hlpr_lookat
+    uri: git@github.com:HLP-R/hlpr_lookat.git
+    version: master
+
+- git:
+    local-name: hlpr_manipulation
+    uri: git@github.com:HLP-R/hlpr_manipulation.git
+    version: master
+
+- git:
+    local-name: hlpr_speech
+    uri: git@github.com:HLP-R/hlpr_speech.git
+    version: master
+
+- git:
+    local-name: hlpr_kinesthetic_teaching
+    uri: git@github.com:HLP-R/hlpr_kinesthetic_teaching.git
+    version: master
+
+- git:
+    local-name: hlpr_robots
+    uri: git@github.com:HLP-R/hlpr_robots.git
+    version: master
