@@ -2,10 +2,28 @@
 <launch>
 
     <!-- Global flags to turn things on and off -->
+    <!-- Note: for the standard vector urdf, sent any urdf flags to false -->
     <arg name="poli_urdf" default="false"/> <!-- Sets what URDF to use -->
+    <arg name="prentice_urdf" default="false"/> <!-- Sets what URDF to use -->
     <arg name="verbose" default="false"/> <!-- Global verbose flag -->
     <arg name="sim" default="true"/> <!-- Simulation flag-->
 
+    <!-- Navigation -->
+    <arg name="navigation" default="true"/>
+    <arg name="nav_map" default="simulation_room"/>
+    <arg name="nav_rviz" default="true"/>
+
+    <!-- Arm and Gripper Drivers -->
+    <arg name="jaco_arm" default="true"/>
+    <arg name="gripper_actions" default="false"/>
+
+    <!-- Moveit packages -->
+    <arg name="jaco_moveit" default="false"/>
+    <arg name="use_octomap" default="false"/>
+    <arg name="jaco_moveit_wrapper" default="false"/>
+    <arg name="jaco_primitive_actions" default="false"/>
+    <arg name="jaco_common_actions" default="false"/>
+   
     <!-- Speech internal listener related -->
     <arg name="speech" default="true"/> <!-- Turns ALL speech on and off includes input-->
     <arg name="speech_config_file" default="$(find hlpr_speech_recognition)/config/speech.yaml"/>
@@ -21,25 +39,53 @@
     <arg name="lookat_eef_service" default="false"/> <!-- Compute EEF lookat positions -->
     <arg name="lookat_waypoint_server" default="false"/> <!-- Action server for lookat waypoints -->
 
-    <!-- Navigation -->
-    <arg name="navigation" default="true"/>
-    <arg name="nav_map" default="simulation_room"/>
-    <arg name="nav_rviz" default="true"/>
+    <!-- Kinesthetic Teaching -->
+    <arg name="basic_kinesthetic_mode" default="false"/>
+    <arg name="basic_kt_folder_loc" default="~/"/>
+    <arg name="basic_kit_folder_name" default="kt_data"/>
+    <arg name="basic_kit_data_prefix" default="kt_demo"/>
+    <arg name="kinesthetic_record" default="false"/>
+    <arg name="record_eef_link" default="/right_ee_link"/>
+    <arg name="record_topics" default="$(find hlpr_record_demonstration)/data/topics.yaml"/>
 
-    <!-- Arm Drivers -->
-    <arg name="jaco_arm" default="true"/>
-    
+    <!-- Visual Nodes -->
 
     <!-- NAVIGATION -->
-    <group if="(arg navigation)">
+    <group if="$(arg navigation)">
         <!-- Starts up move base and localization nodes -->
         <include file="$(find vector_navigation_apps)/launch/2d_map_nav_demo.launch">
             <arg name="map_file" value="$(arg nav_map)"/>
+            <arg name="sim" value="$(arg sim)"/>
         </include>
 
         <!-- Launch GUI for viewing -->
-        <include file="$(find vector_viz)/launch/view_robot.launch" if="(arg nav_rviz)">
+        <include file="$(find vector_viz)/launch/view_robot.launch" if="$(arg nav_rviz)">
             <arg name="function" value="map_nav"/>
+        </include>
+    </group>
+
+    <!-- JACO ARM AND GRIPPER-->
+    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" if="$(arg jaco_arm)">
+        <arg name="sim" value="$(arg sim)"/>
+    </include>
+    <node name="gripper_actions" pkg="robotiq_85_gripper_actions" type="gripper_actions" respawn="false" output="screen" if="$(arg gripper_actions)"/>
+
+    <!-- MOVEIT -->
+    <group if="$(arg jaco_moveit)">
+        <!-- Start moveit -->
+        <include file="$(find hlpr_wpi_jaco_moveit_config)/launch/hlpr_wpi_jaco_simple_moveit.launch">
+                <arg name="custom_sdf" value="$(find poli_moveit_config)/config/vector.srdf" if="$(arg poli_urdf)"/>
+                <arg name="custom_sdf" value="$(find prentice_moveit_config)/config/vector.srdf" if="$(arg prentice_urdf)"/>
+                <arg name="use_wpi_jaco_exec" value="true"/>
+                <arg name="sim" value="$(arg sim)"/>
+                <arg name="use_octomap" value="$(arg use_octomap)"/>
+        </include>
+
+        <!-- Start the hlpr_manip_actions -->
+        <include file="$(find hlpr_manipulation_actions)/launch/start_manip_actions.launch">
+            <arg name="moveit_wrapper" value="$(arg jaco_moveit_wrapper)"/>
+            <arg name="primitive_actions" value="$(arg jaco_primitive_actions)"/>
+            <arg name="common_actions" value="$(arg jaco_common_actions)"/>
         </include>
     </group>
 
@@ -60,7 +106,7 @@
     </group>
 
     <!-- LOOKAT -->
-    <group if="$(arg lookat)"/>
+    <group if="$(arg lookat)">
         <!-- Start the backend IK look service -->
         <include file="$(find hlpr_lookat)/launch/start_lookat_service.launch">
             <arg name="poli_urdf" value="$(arg poli_urdf)"/>
@@ -68,7 +114,10 @@
         </include>
 
         <!-- Start the lookat EEF service -->
-        <node name="hlpr_lookat_eef" pkg="hlpr_lookat" type="look_at_eef.py" respawn="false" output="screen" / if="$(lookat_eef_service)">
+        <node name="hlpr_lookat_eef" pkg="hlpr_lookat" type="look_at_eef.py" respawn="false" output="screen" if="$(arg lookat_eef_service)"/>
+        <node name="eef_pub" pkg="hlpr_record_demonstration" type="eef_publisher.py" respawn="false" output="screen" if="$(arg lookat_eef_service)">
+            <param name="eef_link" value="$(arg record_eef_link)"/>
+        </node>
 
         <!-- Start a lookat waypoint lookat service -->
         <include file="$(find hlpr_lookat)/launch/waypoint_action_server.launch" if="$(arg lookat_waypoint_server)">
@@ -76,10 +125,20 @@
         </include>
     </group>
 
-
+    <!-- KINESTHETIC SERVICES -->
+    <!-- Actual voice commands for robot control -->
+    <include file="$(find hlpr_kinesthetic_interaction)/launch/start_kinesthetic_mode.launch" if="$(arg basic_kinesthetic_mode)">
+        <arg name="data_folder_loc" value="$(arg basic_kt_folder_loc)"/>
+        <arg name="data_folder_name" value="$(arg basic_kt_folder_name)"/>
+        <arg name="data_prefix" value="$(arg basic_kt_data_prefix)"/>
+    </include> 
     
-
-
+    <!-- Recording bag topics for playback -->
+    <include file="$(find hlpr_record_demonstration)/launch/start_record_services.launch" if="$(arg kinesthetic_record)">
+        <arg name="eef_link" value="$(arg record_eef_link)"/>
+        <arg name="topic_loc" value="$(arg record_topics)"/>
+        <arg name="start_eef_pub" value="false"/>
+    </include>
 
 
 
