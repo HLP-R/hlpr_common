@@ -19,7 +19,7 @@
 
         <!-- Moveit packages -->
         <arg name="jaco_moveit" default="true"/>
-        <arg name="use_octomap" default="true"/>
+        <arg name="use_octomap" default="false"/>
         <arg name="jaco_moveit_wrapper" default="true"/>
         <arg name="jaco_primitive_actions" default="true"/>
         <arg name="jaco_common_actions" default="true"/>
@@ -40,11 +40,11 @@
         <arg name="lookat_waypoint_server" default="true"/> <!-- Action server for lookat waypoints -->
 
         <!-- Kinesthetic Teaching -->
-        <arg name="basic_kinesthetic_mode" default="false"/>
-        <arg name="basic_kt_folder_loc" default="~/"/>
-        <arg name="basic_kit_folder_name" default="kt_data"/>
-        <arg name="basic_kit_data_prefix" default="kt_demo"/>
+        <arg name="basic_kinesthetic_mode" default="true"/>
         <arg name="kinesthetic_record" default="false"/>
+        <arg name="basic_kt_folder_loc" default="~/"/>
+        <arg name="basic_kt_folder_name" default="kt_data"/>
+        <arg name="basic_kt_data_prefix" default="kt_demo"/>
         <arg name="record_eef_link" default="/right_ee_link"/>
         <arg name="record_topics" default="$(find hlpr_record_demonstration)/data/topics.yaml"/>
     </include>
