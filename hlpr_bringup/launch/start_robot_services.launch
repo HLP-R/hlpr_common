@@ -4,7 +4,7 @@
     <!-- Global flags to turn things on and off -->
     <!-- Note: for the standard vector urdf, sent any urdf flags to false -->
     <arg name="poli_urdf" default="false"/> <!-- Sets what URDF to use -->
-    <arg name="prentice_urdf" default="false"/> <!-- Sets what URDF to use -->
+    <arg name="prentice_urdf" default="false"/> <!-- DO NOT USE YET: Sets what URDF to use -->
     <arg name="verbose" default="false"/> <!-- Global verbose flag -->
     <arg name="sim" default="true"/> <!-- Simulation flag-->
 
@@ -16,6 +16,8 @@
     <!-- Arm and Gripper Drivers -->
     <arg name="jaco_arm" default="true"/>
     <arg name="gripper_actions" default="false"/>
+    <arg name="pub_eef" default="true"/>
+    <arg name="eef_link" default="/right_ee_link"/>
 
     <!-- Moveit packages -->
     <arg name="jaco_moveit" default="false"/>
@@ -31,6 +33,7 @@
 
     <!-- Speech external input (mic or gui) -->
     <arg name="speech_gui" default="true"/>
+    <arg name="speech_mic" default="false"/>
     <arg name="speech_dict_path" default="$(find hlpr_speech_recognition)/data/kps.dic" />
     <arg name="speech_kps_path" default="$(find hlpr_speech_recognition)/data/kps.txt" />
 
@@ -45,7 +48,6 @@
     <arg name="basic_kt_folder_name" default="kt_data"/>
     <arg name="basic_kt_data_prefix" default="kt_demo"/>
     <arg name="kinesthetic_record" default="false"/>
-    <arg name="record_eef_link" default="/right_ee_link"/>
     <arg name="record_topics" default="$(find hlpr_record_demonstration)/data/topics.yaml"/>
 
     <!-- Visual Nodes -->
@@ -69,6 +71,9 @@
         <arg name="sim" value="$(arg sim)"/>
     </include>
     <node name="gripper_actions" pkg="robotiq_85_gripper_actions" type="gripper_actions" respawn="false" output="screen" if="$(arg gripper_actions)"/>
+    <node name="eef_pub" pkg="hlpr_record_demonstration" type="eef_publisher.py" respawn="false" output="screen" if="$(arg pub_eef)">
+        <param name="eef_link" value="$(arg eef_link)"/>
+    </node>
 
     <!-- MOVEIT -->
     <group if="$(arg jaco_moveit)">
@@ -97,9 +102,10 @@
             <arg name="config_file" value="$(arg speech_config_file)"/>
         </include>
 
-        <!-- Start speech input (mic or gui)-->
+        <!-- Start speech input (gui)-->
         <node name="speech_input" pkg="hlpr_speech_recognition" type="speech_gui" output="screen" if="$(arg speech_gui)"/>
-        <include file="$(find hlpr_speech_recognition)/launch/speech_microphone.launch" unless="$(arg speech_gui)">
+        <!-- Start speech input (mic)-->
+        <include file="$(find hlpr_speech_recognition)/launch/speech_microphone.launch" if="$(arg speech_mic)">
             <arg name="dict_path" value="$(arg speech_dict_path)"/>
             <arg name="kps_path" value="$(arg speech_kps_path)"/>
         </include>
@@ -115,9 +121,6 @@
 
         <!-- Start the lookat EEF service -->
         <node name="hlpr_lookat_eef" pkg="hlpr_lookat" type="look_at_eef.py" respawn="false" output="screen" if="$(arg lookat_eef_service)"/>
-        <node name="eef_pub" pkg="hlpr_record_demonstration" type="eef_publisher.py" respawn="false" output="screen" if="$(arg lookat_eef_service)">
-            <param name="eef_link" value="$(arg record_eef_link)"/>
-        </node>
 
         <!-- Start a lookat waypoint lookat service -->
         <include file="$(find hlpr_lookat)/launch/waypoint_action_server.launch" if="$(arg lookat_waypoint_server)">
@@ -135,7 +138,7 @@
     
     <!-- Recording bag topics for playback -->
     <include file="$(find hlpr_record_demonstration)/launch/start_record_services.launch" if="$(arg kinesthetic_record)">
-        <arg name="eef_link" value="$(arg record_eef_link)"/>
+        <arg name="eef_link" value="$(arg eef_link)"/>
         <arg name="topic_loc" value="$(arg record_topics)"/>
         <arg name="start_eef_pub" value="false"/>
     </include>

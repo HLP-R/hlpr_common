@@ -4,7 +4,7 @@
     <!-- Example of how to start different services -->
     <include file="$(find hlpr_bringup)/launch/start_robot_services.launch">
         <arg name="poli_urdf" default="false"/> <!-- Sets what URDF to use -->
-        <arg name="prentice_urdf" default="false"/> <!-- Sets what URDF to use -->
+        <arg name="prentice_urdf" default="false"/> <!-- DO NOT USE YET. Sets what URDF to use -->
         <arg name="verbose" default="true"/> <!-- Global verbose flag -->
         <arg name="sim" default="true"/> <!-- Simulation flag-->
 
@@ -16,6 +16,8 @@
         <!-- Arm and Gripper Drivers -->
         <arg name="jaco_arm" default="true"/>
         <arg name="gripper_actions" default="true"/>
+        <arg name="pub_eef" default="true"/>
+        <arg name="eef_link" default="/right_ee_link"/>
 
         <!-- Moveit packages -->
         <arg name="jaco_moveit" default="true"/>
@@ -31,6 +33,7 @@
 
         <!-- Speech external input (mic or gui) -->
         <arg name="speech_gui" default="true"/>
+        <arg name="speech_mic" default="false"/>
         <arg name="speech_dict_path" default="$(find hlpr_speech_recognition)/data/kps.dic" />
         <arg name="speech_kps_path" default="$(find hlpr_speech_recognition)/data/kps.txt" />
 
@@ -45,7 +48,6 @@
         <arg name="basic_kt_folder_loc" default="~/"/>
         <arg name="basic_kt_folder_name" default="kt_data"/>
         <arg name="basic_kt_data_prefix" default="kt_demo"/>
-        <arg name="record_eef_link" default="/right_ee_link"/>
         <arg name="record_topics" default="$(find hlpr_record_demonstration)/data/topics.yaml"/>
     </include>
 
