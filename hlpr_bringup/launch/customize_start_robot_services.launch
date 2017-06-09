@@ -44,7 +44,8 @@
 
         <!-- Kinesthetic Teaching -->
         <arg name="basic_kinesthetic_mode" default="true"/>
-        <arg name="kinesthetic_record" default="false"/>
+        <arg name="kinesthetic_record" default="true"/>
+        <arg name="kinesthetic_playback" default="true"/>
         <arg name="basic_kt_folder_loc" default="~/"/>
         <arg name="basic_kt_folder_name" default="kt_data"/>
         <arg name="basic_kt_data_prefix" default="kt_demo"/>

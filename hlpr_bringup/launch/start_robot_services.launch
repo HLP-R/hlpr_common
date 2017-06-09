@@ -48,6 +48,7 @@
     <arg name="basic_kt_folder_name" default="kt_data"/>
     <arg name="basic_kt_data_prefix" default="kt_demo"/>
     <arg name="kinesthetic_record" default="false"/>
+    <arg name="kinesthetic_playback" default="false"/>
     <arg name="record_topics" default="$(find hlpr_record_demonstration)/data/topics.yaml"/>
 
     <!-- Visual Nodes -->
@@ -143,6 +144,9 @@
         <arg name="start_eef_pub" value="false"/>
     </include>
 
+    <!-- Playback server kinesthetic teaching -->
+    <include file="$(find hlpr_record_demonstration)/launch/start_playback_services.launch" if="$(arg kinesthetic_playback)">
+    </include>
 
 
 </launch>
