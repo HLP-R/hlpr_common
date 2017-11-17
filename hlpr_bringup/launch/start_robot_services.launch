@@ -14,8 +14,8 @@
     <arg name="nav_rviz" default="true"/>
 
     <!-- Arm and Gripper Drivers -->
-    <arg name="jaco_arm" default="true"/>
-    <arg name="jaco_7dof_arm" default="false"/> <!-- WARNING: don't have both arms set true-->
+    <arg name="jaco_arm" default="true"/> <!-- WARNING: Not used anymore -->
+    <arg name="jaco_arm_driver" default="true"/> <!-- Do you start the jaco arm driver -->
     <arg name="gripper_actions" default="false"/>
     <arg name="pub_eef" default="true"/>
     <arg name="eef_link" default="/right_ee_link"/>
@@ -69,14 +69,18 @@
     </group>
 
     <!-- JACO ARM AND GRIPPER-->
-    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" if="$(arg jaco_arm)">
-        <arg name="sim" value="$(arg sim)"/>
-    </include>
-    <include file="$(find kinova_bringup)/launch/arm.launch" if="$(arg jaco_7dof_arm)">
-        <arg name="sim" value="$(arg sim)"/>
-    </include>
+    <group if="$(arg jaco_arm_driver)">
+        <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" unless="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
+            <arg name="sim" value="$(arg sim)"/>
+        </include>
+        <include file="$(find kinova_bringup)/launch/arm.launch" if="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
+            <arg name="sim" value="$(arg sim)"/>
+        </include>
+    </group>
 
     <node name="gripper_actions" pkg="robotiq_85_gripper_actions" type="gripper_actions" respawn="false" output="screen" if="$(arg gripper_actions)"/>
+
+    <!-- publish EEF relative to base -->
     <node name="eef_pub" pkg="hlpr_record_demonstration" type="eef_publisher.py" respawn="false" output="screen" if="$(arg pub_eef)">
         <param name="eef_link" value="$(arg eef_link)"/>
     </node>
@@ -84,7 +88,7 @@
     <!-- MOVEIT -->
     <group if="$(arg jaco_moveit)">
         <!-- Start moveit: This starts regular 6dof -->
-        <include file="$(find hlpr_wpi_jaco_moveit_config)/launch/hlpr_wpi_jaco_simple_moveit.launch" unless="$(arg jaco_7dof_arm)">
+        <include file="$(find hlpr_wpi_jaco_moveit_config)/launch/hlpr_wpi_jaco_simple_moveit.launch" unless="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
                 <arg name="custom_sdf" value="$(find poli_moveit_config)/config/vector.srdf" if="$(arg poli_urdf)"/>
                 <arg name="custom_sdf" value="$(find prentice_moveit_config)/config/vector.srdf" if="$(arg prentice_urdf)"/>
                 <arg name="use_wpi_jaco_exec" value="true"/>
@@ -93,7 +97,7 @@
         </include>
 
         <!-- Startup moveit 7dof if 7dof arm -->
-        <include file="$(find hlpr_j2s7s300_moveit_config)/launch/hlpr_simple_moveit.launch" if="$(arg jaco_7dof_arm)">
+        <include file="$(find hlpr_j2s7s300_moveit_config)/launch/hlpr_simple_moveit.launch" if="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
                 <arg name="custom_sdf" value="$(find poli_moveit_config)/config/vector.srdf" if="$(arg poli_urdf)"/>
                 <arg name="custom_sdf" value="$(find prentice_moveit_config)/config/vector.srdf" if="$(arg prentice_urdf)"/>
                 <arg name="use_hlpr_traj_exec" value="true"/>

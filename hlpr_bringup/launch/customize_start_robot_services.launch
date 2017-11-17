@@ -14,11 +14,11 @@
         <arg name="nav_rviz" default="true"/>
 
         <!-- Arm and Gripper Drivers -->
-        <arg name="jaco_arm" default="true"/>
-        <arg name="jaco_7dof_arm" default="false"/> <!-- WARNING: don't have both arms set true-->
+        <arg name="jaco_arm_driver" default="true"/>
         <arg name="gripper_actions" default="true"/>
         <arg name="pub_eef" default="true"/>
-        <arg name="eef_link" default="/right_ee_link"/>
+        <arg name="eef_link" default="/j2s7s300_ee_link" if="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)"/>
+        <arg name="eef_link" default="/right_ee_link" unless="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)"/>
 
         <!-- Moveit packages -->
         <arg name="jaco_moveit" default="true"/>
