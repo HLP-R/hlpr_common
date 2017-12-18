@@ -1,0 +1,28 @@
+- git:
+    local-name: hlpr_robots
+    uri: https://github.com/HLP-R/hlpr_robots.git
+    version: kinetic-devel
+- git:
+    local-name: hlpr_common
+    uri: https://github.com/HLP-R/hlpr_common.git
+    version: kinetic-devel
+- git:
+    local-name: hlpr_kinesthic_teaching
+    uri: https://github.com/HLP-R/hlpr_kinesthetic_teaching.git
+    version: kinetic-devel
+- git:
+    local-name: hlpr_manipulation
+    uri: https://github.com/HLP-R/hlpr_manipulation.git
+    version: kinetic-devel
+- git:
+    local-name: hlpr_speech
+    uri: https://github.com/HLP-R/hlpr_speech.git
+    version: kinetic-devel
+- git:
+    local-name: hlpr_lookat
+    uri: https://github.com/HLP-R/hlpr_lookat.git
+    version: kinetic-devel
+- git:
+    local-name: hlpr_simulator
+    uri: https://github.com/HLP-R/hlpr_simulator.git
+    version: kinetic-devel
