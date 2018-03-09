@@ -21,11 +21,11 @@
         <arg name="eef_link" default="/right_ee_link" unless="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)"/>
 
         <!-- Moveit packages -->
-        <arg name="jaco_moveit" default="true"/>
+        <arg name="moveit" default="true"/>
         <arg name="use_octomap" default="false"/>
-        <arg name="jaco_moveit_wrapper" default="false"/>
-        <arg name="jaco_primitive_actions" default="false"/>
-        <arg name="jaco_common_actions" default="false"/>
+        <arg name="hlpr_manip_moveit_wrapper" default="false"/>
+        <arg name="hlpr_manip_primitive_actions" default="false"/>
+        <arg name="hlpr_manip_common_actions" default="false"/>
        
         <!-- Speech internal listener related -->
         <arg name="speech" default="true"/> <!-- Turns ALL speech on and off includes input-->
