@@ -14,18 +14,18 @@
     <arg name="nav_rviz" default="true"/>
 
     <!-- Arm and Gripper Drivers -->
-    <arg name="jaco_arm" default="true"/>
-    <arg name="jaco_7dof_arm" default="false"/> <!-- WARNING: don't have both arms set true-->
+    <!-- If true, launch the low-level arm driver. -->
+    <arg name="jaco_arm_driver" default="true"/>
     <arg name="gripper_actions" default="false"/>
     <arg name="pub_eef" default="true"/>
     <arg name="eef_link" default="/right_ee_link"/>
 
     <!-- Moveit packages -->
-    <arg name="jaco_moveit" default="false"/>
+    <arg name="moveit" default="false"/>
     <arg name="use_octomap" default="false"/>
-    <arg name="jaco_moveit_wrapper" default="false"/>
-    <arg name="jaco_primitive_actions" default="false"/>
-    <arg name="jaco_common_actions" default="false"/>
+    <arg name="hlpr_manip_moveit_wrapper" default="false"/>
+    <arg name="hlpr_manip_primitive_actions" default="false"/>
+    <arg name="hlpr_manip_common_actions" default="false"/>
    
     <!-- Speech internal listener related -->
     <arg name="speech" default="true"/> <!-- Turns ALL speech on and off includes input-->
@@ -69,22 +69,26 @@
     </group>
 
     <!-- JACO ARM AND GRIPPER-->
-    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" if="$(arg jaco_arm)">
-        <arg name="sim" value="$(arg sim)"/>
-    </include>
-    <include file="$(find kinova_bringup)/launch/arm.launch" if="$(arg jaco_7dof_arm)">
-        <arg name="sim" value="$(arg sim)"/>
-    </include>
+    <group if="$(arg jaco_arm_driver)">
+        <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" unless="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
+            <arg name="sim" value="$(arg sim)"/>
+        </include>
+        <include file="$(find kinova_bringup)/launch/arm.launch" if="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
+            <arg name="sim" value="$(arg sim)"/>
+        </include>
+    </group>
 
     <node name="gripper_actions" pkg="robotiq_85_gripper_actions" type="gripper_actions" respawn="false" output="screen" if="$(arg gripper_actions)"/>
+
+    <!-- publish EEF relative to base -->
     <node name="eef_pub" pkg="hlpr_record_demonstration" type="eef_publisher.py" respawn="false" output="screen" if="$(arg pub_eef)">
         <param name="eef_link" value="$(arg eef_link)"/>
     </node>
 
     <!-- MOVEIT -->
-    <group if="$(arg jaco_moveit)">
+    <group if="$(arg moveit)">
         <!-- Start moveit: This starts regular 6dof -->
-        <include file="$(find hlpr_wpi_jaco_moveit_config)/launch/hlpr_wpi_jaco_simple_moveit.launch" unless="$(arg jaco_7dof_arm)">
+        <include file="$(find hlpr_wpi_jaco_moveit_config)/launch/hlpr_wpi_jaco_simple_moveit.launch" unless="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
                 <arg name="custom_sdf" value="$(find poli_moveit_config)/config/vector.srdf" if="$(arg poli_urdf)"/>
                 <arg name="custom_sdf" value="$(find prentice_moveit_config)/config/vector.srdf" if="$(arg prentice_urdf)"/>
                 <arg name="use_wpi_jaco_exec" value="true"/>
@@ -93,7 +97,7 @@
         </include>
 
         <!-- Startup moveit 7dof if 7dof arm -->
-        <include file="$(find hlpr_j2s7s300_moveit_config)/launch/hlpr_simple_moveit.launch" if="$(arg jaco_7dof_arm)">
+        <include file="$(find hlpr_j2s7s300_moveit_config)/launch/hlpr_simple_moveit.launch" if="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)">
                 <arg name="custom_sdf" value="$(find poli_moveit_config)/config/vector.srdf" if="$(arg poli_urdf)"/>
                 <arg name="custom_sdf" value="$(find prentice_moveit_config)/config/vector.srdf" if="$(arg prentice_urdf)"/>
                 <arg name="use_hlpr_traj_exec" value="true"/>
@@ -103,9 +107,9 @@
 
         <!-- Start the hlpr_manip_actions -->
         <include file="$(find hlpr_manipulation_actions)/launch/start_manip_actions.launch">
-            <arg name="moveit_wrapper" value="$(arg jaco_moveit_wrapper)"/>
-            <arg name="primitive_actions" value="$(arg jaco_primitive_actions)"/>
-            <arg name="common_actions" value="$(arg jaco_common_actions)"/>
+            <arg name="moveit_wrapper" value="$(arg hlpr_manip_moveit_wrapper)"/>
+            <arg name="primitive_actions" value="$(arg hlpr_manip_primitive_actions)"/>
+            <arg name="common_actions" value="$(arg hlpr_manip_common_actions)"/>
         </include>
     </group>
 

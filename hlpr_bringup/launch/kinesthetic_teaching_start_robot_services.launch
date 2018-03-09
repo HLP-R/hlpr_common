@@ -16,7 +16,7 @@
         <!-- Arm and Gripper Drivers -->
         <arg name="jaco_arm_driver" default="false"/>
         <arg name="gripper_actions" default="false"/>
-        <arg name="pub_eef" default="false"/>
+        <arg name="pub_eef" default="true"/>
         <arg name="eef_link" default="/j2s7s300_ee_link" if="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)"/>
         <arg name="eef_link" default="/right_ee_link" unless="$(optenv VECTOR_HAS_KINOVA_7DOF_ARM false)"/>
 
@@ -28,7 +28,7 @@
         <arg name="hlpr_manip_common_actions" default="false"/>
        
         <!-- Speech internal listener related -->
-        <arg name="speech" default="false"/> <!-- Turns ALL speech on and off includes input-->
+        <arg name="speech" default="true"/> <!-- Turns ALL speech on and off includes input-->
         <arg name="speech_config_file" default="$(find hlpr_speech_recognition)/config/speech.yaml"/>
         <arg name="speech_yaml_list" default="$(find hlpr_speech_recognition)/data/kps.yaml"/>
 
@@ -45,7 +45,7 @@
 
         <!-- Kinesthetic Teaching -->
         <arg name="basic_kinesthetic_mode" default="false"/>
-        <arg name="kinesthetic_record" default="false"/>
+        <arg name="kinesthetic_record" default="true"/>
         <arg name="kinesthetic_playback" default="true"/>
         <arg name="basic_kt_folder_loc" default="~/"/>
         <arg name="basic_kt_folder_name" default="kt_data"/>
