@@ -3,19 +3,20 @@
 
     <!-- Example of how to start different services -->
     <include file="$(find hlpr_bringup)/launch/start_robot_services.launch">
+        <arg name="gemini_urdf" default="true"/> <!-- Sets what URDF to use -->
         <arg name="poli_urdf" default="false"/> <!-- Sets what URDF to use -->
         <arg name="prentice_urdf" default="false"/> <!-- DO NOT USE YET. Sets what URDF to use -->
         <arg name="verbose" default="true"/> <!-- Global verbose flag -->
-        <arg name="sim" default="true"/> <!-- Simulation flag-->
+        <arg name="sim" default="false"/> <!-- Simulation flag-->
 
         <!-- Navigation -->
-        <arg name="navigation" default="true"/>
+        <arg name="navigation" default="false"/>
         <arg name="nav_map" default="simulation_room"/>
         <arg name="nav_rviz" default="true"/>
 
         <!-- Arm and Gripper Drivers -->
-        <arg name="jaco_arm" default="true"/>
-        <arg name="jaco_7dof_arm" default="false"/> <!-- WARNING: don't have both arms set true-->
+        <arg name="jaco_arm" default="false"/>
+        <arg name="jaco_7dof_arm" default="true"/> <!-- WARNING: don't have both arms set true-->
         <arg name="gripper_actions" default="true"/>
         <arg name="pub_eef" default="true"/>
         <arg name="eef_link" default="/right_ee_link"/>
@@ -23,9 +24,9 @@
         <!-- Moveit packages -->
         <arg name="jaco_moveit" default="true"/>
         <arg name="use_octomap" default="false"/>
-        <arg name="jaco_moveit_wrapper" default="true"/>
-        <arg name="jaco_primitive_actions" default="true"/>
-        <arg name="jaco_common_actions" default="true"/>
+        <arg name="jaco_moveit_wrapper" default="false"/>
+        <arg name="jaco_primitive_actions" default="false"/>
+        <arg name="jaco_common_actions" default="false"/>
        
         <!-- Speech internal listener related -->
         <arg name="speech" default="true"/> <!-- Turns ALL speech on and off includes input-->
@@ -33,7 +34,7 @@
         <arg name="speech_yaml_list" default="$(find hlpr_speech_recognition)/data/kps.yaml"/>
 
         <!-- Speech external input (mic or gui) -->
-        <arg name="speech_gui" default="true"/>
+        <arg name="speech_gui" default="false"/>
         <arg name="speech_mic" default="false"/>
         <arg name="speech_dict_path" default="$(find hlpr_speech_recognition)/data/kps.dic" />
         <arg name="speech_kps_path" default="$(find hlpr_speech_recognition)/data/kps.txt" />

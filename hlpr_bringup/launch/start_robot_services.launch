@@ -3,6 +3,7 @@
 
     <!-- Global flags to turn things on and off -->
     <!-- Note: for the standard vector urdf, sent any urdf flags to false -->
+    <arg name="gemini_urdf" default="false"/> <!-- Sets what URDF to use -->
     <arg name="poli_urdf" default="false"/> <!-- Sets what URDF to use -->
     <arg name="prentice_urdf" default="false"/> <!-- DO NOT USE YET: Sets what URDF to use -->
     <arg name="verbose" default="false"/> <!-- Global verbose flag -->
@@ -69,12 +70,15 @@
     </group>
 
     <!-- JACO ARM AND GRIPPER-->
-    <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" if="$(arg jaco_arm)">
-        <arg name="sim" value="$(arg sim)"/>
-    </include>
-    <include file="$(find kinova_bringup)/launch/arm.launch" if="$(arg jaco_7dof_arm)">
-        <arg name="sim" value="$(arg sim)"/>
-    </include>
+    <group unless="$(arg gemini_urdf)">
+        <include file="$(find wpi_jaco_wrapper)/launch/arm.launch" if="$(arg jaco_arm)">
+            <arg name="sim" value="$(arg sim)"/>
+        </include>
+
+        <include file="$(find kinova_bringup)/launch/arm.launch" if="$(arg jaco_7dof_arm)">
+            <arg name="sim" value="$(arg sim)"/>
+        </include>
+    </group>
 
     <node name="gripper_actions" pkg="robotiq_85_gripper_actions" type="gripper_actions" respawn="false" output="screen" if="$(arg gripper_actions)"/>
     <node name="eef_pub" pkg="hlpr_record_demonstration" type="eef_publisher.py" respawn="false" output="screen" if="$(arg pub_eef)">
@@ -83,24 +87,36 @@
 
     <!-- MOVEIT -->
     <group if="$(arg jaco_moveit)">
-        <!-- Start moveit: This starts regular 6dof -->
-        <include file="$(find hlpr_wpi_jaco_moveit_config)/launch/hlpr_wpi_jaco_simple_moveit.launch" unless="$(arg jaco_7dof_arm)">
+        <group unless="$(arg gemini_urdf)">
+            <!-- Start moveit: This starts regular 6dof -->
+            <include file="$(find hlpr_wpi_jaco_moveit_config)/launch/hlpr_wpi_jaco_simple_moveit.launch" unless="$(arg jaco_7dof_arm)">
                 <arg name="custom_sdf" value="$(find poli_moveit_config)/config/vector.srdf" if="$(arg poli_urdf)"/>
                 <arg name="custom_sdf" value="$(find prentice_moveit_config)/config/vector.srdf" if="$(arg prentice_urdf)"/>
                 <arg name="use_wpi_jaco_exec" value="true"/>
                 <arg name="sim" value="$(arg sim)"/>
                 <arg name="use_octomap" value="$(arg use_octomap)"/>
-        </include>
+            </include>
 
-        <!-- Startup moveit 7dof if 7dof arm -->
-        <include file="$(find hlpr_j2s7s300_moveit_config)/launch/hlpr_simple_moveit.launch" if="$(arg jaco_7dof_arm)">
+            <!-- Startup moveit 7dof if 7dof arm -->
+            <include file="$(find hlpr_j2s7s300_moveit_config)/launch/hlpr_simple_moveit.launch" if="$(arg jaco_7dof_arm)">
                 <arg name="custom_sdf" value="$(find poli_moveit_config)/config/vector.srdf" if="$(arg poli_urdf)"/>
                 <arg name="custom_sdf" value="$(find prentice_moveit_config)/config/vector.srdf" if="$(arg prentice_urdf)"/>
                 <arg name="use_hlpr_traj_exec" value="true"/>
                 <arg name="sim" value="$(arg sim)"/>
                 <arg name="use_octomap" value="$(arg use_octomap)"/>
-        </include>
+            </include>
+        </group>
 
+        <group if="$(arg gemini_urdf)">
+            <!-- Startup gemini moveit 7dof if 7dof arm -->
+            <include file="$(find hlpr_jaco_moveit_config_two_arms_7dof)/launch/hlpr_simple_moveit.launch" if="$(arg jaco_7dof_arm)">
+                <arg name="custom_sdf" value="$(find hlpr_jaco_moveit_config_two_arms_7dof)/config/vector.srdf"/>
+                <arg name="use_hlpr_traj_exec" value="true"/>
+                <arg name="sim" value="$(arg sim)"/>
+                <arg name="use_octomap" value="$(arg use_octomap)"/>
+            </include>
+        </group>
+        
         <!-- Start the hlpr_manip_actions -->
         <include file="$(find hlpr_manipulation_actions)/launch/start_manip_actions.launch">
             <arg name="moveit_wrapper" value="$(arg jaco_moveit_wrapper)"/>
